@@ -27,8 +27,10 @@ in {
   rocmConfig ? {
     gfxVersion = "11.0.0";
     target = "gfx1100";
-    devices = "0,1";
+    devices = "1";
   },
+  shellHookBefore ? "",
+  shellHookAfter ? "",
   extraEnvironment ? {},
 }:
 
@@ -103,6 +105,12 @@ let
         HIP_VISIBLE_DEVICES = rocmConfig.devices;
         HCC_AMDGPU_TARGET = rocmConfig.target;
         HSA_OVERRIDE_GFX_VERSION = rocmConfig.gfxVersion;
+        # For flash_attn
+        GPUS_ARCH = rocmConfig.target;
+        PYTORCH_ROCM_ARCH = rocmConfig.target;
+        # From https://github.com/huggingface/optimum-amd/blob/main/docker/transformers-pytorch-amd-gpu-flash/Dockerfile
+        FLASH_ATT_V2_COMMIT_ROCM="2554f490101742ccdc56620a938f847f61754be6";
+        FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE
       };
       shellHook = "";
     };
@@ -152,6 +160,7 @@ in pkgs.mkShell (rec {
   UV_PYTHON_FLAG = venv.pythonFlag;
 
   shellHook = ''
+    ${shellHookBefore}
     export GITSTATUS_LOG_LEVEL=DEBUG
     ${venv.shellHook}
     ${acceleration.shellHook}
@@ -160,7 +169,8 @@ in pkgs.mkShell (rec {
     function uv-nix() {
       uv $@ $UV_PYTHON_FLAG
     }
-
     ${optionalString (!pythonConfig.project) "${venv.installCommand} -r requirements.txt"}
+    ${shellHookAfter}
   '';
+
 } // extraEnvironment // acceleration.extraEnvironment)

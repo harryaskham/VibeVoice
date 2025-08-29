@@ -6,6 +6,7 @@ rec {
     torchConfig = {
       version = {
         torch = "2.6.0";
+        triton = "3.2.0";
       };
     };
   };
