@@ -17,7 +17,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "torch",
+    "torch==2.6.0",
     "accelerate==1.6.0",
     "transformers==4.51.3", # we develop this project on transformers==4.51.3, later version may not be compatible
     "llvmlite>=0.40.0",
@@ -31,13 +31,16 @@ dependencies = [
     "absl-py",
     "gradio",
     "av",
-    "aiortc"
+    "aiortc",
 ]
 
 
 [project.urls]
 "Homepage" = "https://github.com/microsoft/VibeVoice"
 "Bug Tracker" = "https://github.com/microsoft/VibeVoice/issues"
+
+[[tool.uv.index]]
+url = "https://download.pytorch.org/whl/rocm6.2.4"
 
 [tool.setuptools.packages.find]
 where = ["."]
