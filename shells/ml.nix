@@ -110,7 +110,7 @@ let
         PYTORCH_ROCM_ARCH = rocmConfig.target;
         # From https://github.com/huggingface/optimum-amd/blob/main/docker/transformers-pytorch-amd-gpu-flash/Dockerfile
         FLASH_ATT_V2_COMMIT_ROCM="2554f490101742ccdc56620a938f847f61754be6";
-        FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE
+        FLASH_ATTENTION_TRITON_AMD_ENABLE="TRUE";
       };
       shellHook = "";
     };
