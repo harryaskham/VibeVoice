@@ -32,12 +32,11 @@ dependencies = [
     "gradio",
     "av",
     "aiortc",
-    #"triton==3.2.0",
-    "pytorch-triton-rocm==3.2.0",
+    "triton==3.2.0",
+    #"pytorch-triton-rocm==3.2.0",
     "ninja",
     "packaging",
     "flash-attn",
-    "triton==3.2.0",
 ]
 
 [tool.uv.extra-build-dependencies]
@@ -48,12 +47,13 @@ name = "pytorch-rocm"
 url = "https://download.pytorch.org/whl/rocm6.2.4"
 explicit = true
 
+# env | rg "(HIP|HCC|HSA|GPUS|ROCM|FLASH)"
 [tool.uv.extra-build-variables]
-flash-attn = { FLASH_ATTENTION_SKIP_CUDA_BUILD = "TRUE", FLASH_ATT_V2_COMMIT_ROCM="2554f490101742ccdc56620a938f847f61754be6" }
+flash-attn = {HCC_AMDGPU_TARGET = "gfx1100", HIP_VISIBLE_DEVICES = "0,1", HSA_OVERRIDE_GFX_VERSION = "11.0.0", GPUS_ARCH = "gfx1100", PYTORCH_ROCM_ARCH = "gfx1100", FLASH_ATT_V2_COMMIT_ROCM = "2554f490101742ccdc56620a938f847f61754be6", FLASH_ATTENTION_TRITON_AMD_ENABLE = "TRUE", FLASH_ATTENTION_SKIP_CUDA_BUILD = "TRUE" }
 
 [tool.uv.sources]
 torch = [{ index = "pytorch-rocm" }]
-pytorch-triton-rocm = [{ index = "pytorch-rocm" }]
+triton = [{ index = "pytorch-rocm" }]
 
 [project.urls]
 "Homepage" = "https://github.com/microsoft/VibeVoice"

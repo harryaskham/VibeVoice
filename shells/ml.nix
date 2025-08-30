@@ -38,6 +38,7 @@ with pkgs.lib;
 
 let
   # Virtual environment
+  uvBin = "${pkgs.uv}/bin/uv --preview-features extra-build-dependencies";
   venv = rec {
     pythonFlag = {
       ${venvTypeVirtualenv} = "-p python${pythonConfig.package.version}";
@@ -56,23 +57,26 @@ let
 
     createCommand = {
       ${venvTypeVirtualenv} = "python -m venv ${pythonFlag} ${indexFlag}";
-      ${venvTypeUv} = "uv venv ${pythonFlag} ${indexFlag}";
+      ${venvTypeUv} = "${uvBin} venv ${pythonFlag} ${indexFlag}";
     }.${pythonConfig.venvType};
 
     installCommand = {
       ${venvTypeVirtualenv} = "pip install -U --pre ${indexFlag}";
       ${venvTypeUv} = 
         if pythonConfig.project
-        then "uv add ${pythonFlag} ${indexFlag}"
-        else "uv pip install ${pythonFlag} ${indexFlag}";
+        then "${uvBin} add ${pythonFlag} ${indexFlag}"
+        else "${uvBin} pip install ${pythonFlag} ${indexFlag}";
     }.${pythonConfig.venvType};
 
     dir = ".venv";
     shellHook = optionalString (pythonConfig.venvType != venvTypeNone) ''
-      if test ! -d ${dir}; then
-        ${createCommand} ${dir}
+      if [[ -z "$VIRTUAL_ENV" ]]; then
+        echo "Activating virtual environment in ${dir}"
+        if test ! -d ${dir}; then
+          ${createCommand} ${dir}
+        fi
+        source ./${dir}/bin/activate
       fi
-      source ./${dir}/bin/activate
     '';
   };
 
@@ -111,6 +115,7 @@ let
         # From https://github.com/huggingface/optimum-amd/blob/main/docker/transformers-pytorch-amd-gpu-flash/Dockerfile
         FLASH_ATT_V2_COMMIT_ROCM="2554f490101742ccdc56620a938f847f61754be6";
         FLASH_ATTENTION_TRITON_AMD_ENABLE="TRUE";
+        FLASH_ATTENTION_SKIP_CUDA_BUILD="TRUE";
       };
       shellHook = "";
     };
